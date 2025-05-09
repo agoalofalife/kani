@@ -1,13 +1,12 @@
 mod token;
 mod scanner;
 
-use std::fmt::{Display};
 use std::fs;
-use std::{env, fmt};
+use std::{env};
 use crate::scanner::Scanner;
 
 fn main() {
-    let mut has_error = false;
+    // let mut has_error = false;
 
     let args: Vec<String> = env::args().collect();
 
@@ -24,10 +23,11 @@ fn main() {
     println!("{:#?}", scanner)
 }
 
+#[allow(dead_code)]
 fn error(line: i32, message: &str) {
     report(line, "", message);
 }
-
+#[allow(dead_code)]
 fn report(line: i32, location: &str, message: &str) {
     eprintln!("[line {}] Error {} : {}", line, location, message);
 }

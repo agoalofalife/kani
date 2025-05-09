@@ -14,8 +14,6 @@ pub struct Scanner {
 }
 impl Scanner{
     pub fn new() -> Scanner {
-        // let char_positions = content.char_indices().map(|(i, _)| i).collect();
-
         Scanner {
             tokens: Vec::new(),
             // source: content,
@@ -27,8 +25,6 @@ impl Scanner{
     }
     pub fn scan_tokens(&mut self, source: &String) {
         let mut iter = source.char_indices().peekable();
-        let char_positions: Vec<usize> = source.char_indices().map(|(i, _)| i).collect();
-
         let mut keywords:HashMap<String, TokenType> = HashMap::new();
 
         keywords.insert("and".to_string(), And);
@@ -102,7 +98,7 @@ impl Scanner{
                     // handle comments and slash char
                     if self.match_with_next_char('/', &mut iter) {
                         // Ha ha this is comment
-                        while let Some((i, char)) = iter.peek() {
+                        while let Some((_, char)) = iter.peek() {
                             if *char != '\n' {
                                 iter.next();
                             } else {
@@ -197,7 +193,7 @@ impl Scanner{
             };
         }
         self.tokens.push(Token {
-            token_type: TokenType::Eof,
+            token_type: Eof,
             lexeme: "".to_string(),
             literal: TokenVal::Str("".to_string()),
             line: self.line,
@@ -206,7 +202,7 @@ impl Scanner{
 
     fn match_with_next_char(&self, candidate: char, iter: &mut Peekable<CharIndices>) -> bool {
         match iter.peek() {
-            Some((i, char)) => {
+            Some((_, char)) => {
                 if *char == candidate {
                     iter.next();
                     true
@@ -245,5 +241,34 @@ impl Scanner{
     }
     fn is_digit(c:char) -> bool {
         c >= '0' && c <= '9'
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn correct_scanning_simple_function_structure() {
+        let mut scanner = Scanner::new();
+        scanner.scan_tokens(&"\
+        function test() {\
+            return 2 + 3;\
+        }\
+        ".to_string());
+        let mut iter = scanner.tokens.iter();
+
+
+        assert_eq!(iter.next().unwrap().token_type, Function);
+        assert_eq!(iter.next().unwrap().token_type, Identifier);
+        assert_eq!(iter.next().unwrap().token_type, LeftParen);
+        assert_eq!(iter.next().unwrap().token_type, RightParen);
+        assert_eq!(iter.next().unwrap().token_type, LeftBrace);
+        assert_eq!(iter.next().unwrap().token_type, Return);
+        assert_eq!(iter.next().unwrap().token_type, Number);
+        assert_eq!(iter.next().unwrap().token_type, Plus);
+        assert_eq!(iter.next().unwrap().token_type, Number);
+        assert_eq!(iter.next().unwrap().token_type, Semicolon);
+        assert_eq!(iter.next().unwrap().token_type, RightBrace);
     }
 }

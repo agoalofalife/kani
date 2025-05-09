@@ -1,7 +1,7 @@
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     // Single-character tokens
     LeftParen,
@@ -53,7 +53,6 @@ impl Display for TokenType {
         match self {
             TokenType::LeftBrace => write!(f, "LeftBrace"),
             TokenType::RightParen => write!(f, "RightParen"),
-            TokenType::LeftBrace => write!(f, "LeftBrace"),
             TokenType::RightBrace => write!(f, "RightBrace"),
             TokenType::Comma => write!(f, "Comma"),
             TokenType::Dot => write!(f, "Dot"),
@@ -79,7 +78,6 @@ impl Display for TokenType {
             TokenType::For => write!(f, "For"),
             TokenType::If => write!(f, "If"),
             TokenType::Null => write!(f, "Null"),
-            TokenType::Function => write!(f, "Function"),
             TokenType::Or => write!(f, "Or"),
             TokenType::Print => write!(f, "Print"),
             TokenType::Return => write!(f, "Return"),
@@ -106,7 +104,7 @@ impl Display for Token {
         write!(
             f,
             "{}",
-            format!("{} {} {}", self.token_type, self.lexeme, self.literal)
+            format!("{} {} {} {}", self.token_type, self.lexeme, self.literal, self.line)
         )
     }
 }
@@ -117,10 +115,9 @@ pub enum TokenVal {
 }
 impl Display for TokenVal {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            format!("{}", self)
-        )
+        match self {
+            TokenVal::Str(_string) => write!(f, "String"),
+            TokenVal::Float(_f64) => write!(f, "Float"),
+        }
     }
 }
